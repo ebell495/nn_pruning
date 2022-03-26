@@ -126,15 +126,21 @@ class SparseDimensionsLinear(nn.Module):
         if c is not None:
             weight = weight[:, c]
 
-        bias = linear.bias.detach()
-        if r is not None:
-            bias = bias[r]
+        try:
+            bias = linear.bias.detach()
+            if r is not None:
+                bias = bias[r]
+        except AttributeError:
+            bias = None
+            pass
+
 
         if input_extract is None and output_expand is None:
             new_linear = torch.nn.Linear(weight.shape[1], weight.shape[0], bias=True).to(weight.device)
             with torch.no_grad():
                 new_linear.weight.copy_(weight)
-                new_linear.bias.copy_(bias)
+                if bias is not None:
+                    new_linear.bias.copy_(bias)
             ret = new_linear
         else:
             ret = SparseDimensionsLinear(in_features, out_features, weight, bias, input_extract, output_expand, name)

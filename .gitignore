@@ -27,3 +27,6 @@ back
 
 # virtualenv directories
 venv/
+
+# IntelliJ project files
+.idea/
