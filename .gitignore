@@ -24,3 +24,6 @@ wandb
 
 # backup directories
 back
+
+# virtualenv directories
+venv/

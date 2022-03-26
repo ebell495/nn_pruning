@@ -122,7 +122,7 @@ class T5Structure(ModelStructure):
         hidden_size="d_model",
         intermediate_size="d_ff",
         num_hidden_layers="num_layers",
-        num_attention_heads="num_heads",
+        num_attention_heads="n_heads",
         attention_head_size="key_value_proj_dim",
     )
 
@@ -150,11 +150,13 @@ def struct_from_config(config):
 
     if structure is None:
         raise ModelStructureNotFound(f"Model config does not match any of the defined structures.")
+    print(f"Using {structure.__name__} for model structure.")
     return structure
 
 def struct_from_name(model_name):
     for name in name2struct.keys():
         if name in model_name:
+            print(f"Using {name2struct[name].__name__} for model structure.")
             return name2struct[name]
     raise ModelStructureNotFound(f"Model name {model_name} does not match any of the defined structures.")
 
@@ -168,6 +170,7 @@ def struct_from_model(model):
                     num_pattern -= 1
                     break
         if num_pattern == 0:
+            print(f"Using {structure.__name__} for model structure.")
             return structure
     else:
         raise RuntimeError("Model does not match any of the defined structures.")
@@ -182,6 +185,8 @@ def count_num_heads(model):
                     num_attention_heads = module.num_attention_heads
                 elif hasattr(module, 'num_heads'):
                     num_attention_heads = module.num_heads
+                elif hasattr(module, 'n_heads'):
+                    num_attention_heads = module.n_heads
                 else:
                     raise RuntimeError(f"Not able to retrieve number of attention head")
                 head_count += num_attention_heads
